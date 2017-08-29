@@ -25,17 +25,15 @@ def SelfPaginator(request,List,Limit):
         ex:{% include "common/paginator.html" %}
     '''
 
-    paginator = Paginator(List, int(Limit))
-
+    paginator = Paginator(List, int(Limit))  # 实例化一个分页对象,将list分成Limit页
     page = request.GET.get('page')
     try:
-        lst = paginator.page(page)
-    except PageNotAnInteger:
+        lst = paginator.page(page) #返回某一页
+    except PageNotAnInteger:#如果不是int
         lst = paginator.page(1)
-    except EmptyPage:
+    except EmptyPage:#如果没有这一页
         lst = paginator.page(paginator.num_pages)
-
-    return lst
+    return lst#返回选择那一页的内容
 
 
 

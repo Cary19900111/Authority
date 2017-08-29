@@ -8,7 +8,7 @@ class PermissionList(models.Model):
         return '%s%s' %(self.name,self.url)
 class RoleList(models.Model):
     name = models.CharField(max_length=64)
-    Permission = models.ManyToManyField(PermissionList,null=True,blank=True)
+    Permission = models.ManyToManyField('PermissionList',blank=True)
     def __str__(self):
         return self.name
 class UserManager(BaseUserManager):

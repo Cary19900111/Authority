@@ -1,14 +1,13 @@
 {% extends "common/base.nav.html" %}
 
 {% block title %}
-    Login
+    首页
 {% endblock %}
 
 {% block content %}
     <div class="container">
-        <form class="form-horizontal" role="form" action={% url "loginurl" %} method="POST" >
+        <form class="form-horizontal" role="form" action="{% url 'face:login' %}" method="POST" >
         {% csrf_token %}
-
             {% for item in form %}
                 <div class="form-group">
                     <label class="control-label col-md-2 col-sm-4">{{item.label}}</label>

@@ -25,10 +25,9 @@ SECRET_KEY = '^y#g--n4n^zptdp_6t6qiz=#6$0p5t3sz))3@%f+p^q-l^2$vd'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 #add cary
-TEMPLATE_DEBUG = True
+#TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -58,7 +57,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -133,3 +132,5 @@ USE_TZ = True
 AUTH_USER_MODEL = 'face.User'
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
