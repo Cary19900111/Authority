@@ -25,43 +25,33 @@
     <!-- 测试系统列表 -->
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav" style="padding-right: 10%">
-                <li><a href="{% url 'face:flush'%}" style="box-shadow: inset 1px -1px 1px #444, inset -1px 1px 1px #444;" id="li1" >CI系统</a></li>
-                <li><a href="{% url 'face:flush'%}" style="box-shadow: inset 1px -1px 1px #444, inset -1px 1px 1px #444;" id="li2">教评系统</a></li>
-                <li><a href="{% url 'face:flush'%}" style="box-shadow: inset 1px -1px 1px #444, inset -1px 1px 1px #444;" id="li3">问卷系统</a></li>
-                <button type="button" class="btn btn-success" id="btnTerminalSvr">关闭服务器</button>
+                <button type="button" class="btn btn-success" id="ci" onclick="show(this.id)">CI系统</button>
+                <button type="button" class="btn btn-success" id="wj" onclick="show(this.id)">问卷系统</button>
+                <button type="button" class="btn btn-success" id="jp" onclick="show(this.id)">教评系统</button>
             </ul>
         </div>
-        <p id="ntfText">就绪</p>
     <!-- Ajax刷新内容 -->
-        <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav" style="padding-right: 10%">
-                <li>1</li></br>
-                <li>2</li></br>
-                <li>3</li></br>
-            </ul>
+        <div id="ntfText" class="collapse navbar-collapse">
         </div>
     <!-- 页脚 -->
         <div class="col-md-12">
-            <hr />
-            <p class="text-muted">&copy; System 2014</p>
+            <hr/>
+            <p class="text-muted">&copy; TestSystem 2017</p>
         </div>
     </body>
+    <!-- 刷新js -->
     <script type="text/javascript">
-     $("#btnTerminalSvr").click(function(){
-         $.ajax({
-            url: './terminal_svr',
-            type: 'POST',
-            data: {},
-            dataType: 'json',
-            timeout: 10000,
-            success: function(result) {
-            if ( result.result == "post_success" ) {
-              $("#ntfText").html("发起成功");
-            }else {
-              $("#ntfText").html("重复发起了");
-            }
-            }
-           });
-      });
+        function show(id)
+        {
+            $.ajax({
+                url: './terminal_svr',
+                type: 'POST',
+                data: {'action':id},
+                timeout: 10000,
+                success: function(result) {
+                    $("#ntfText").html(result);
+                     }
+                })
+        }
     </script>
 </html>

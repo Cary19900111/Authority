@@ -4,7 +4,12 @@ from django.shortcuts import render
 from .forms import LoginUserForm,ChangePasswordForm,AddUserForm
 from django.contrib import auth
 from django.views.decorators.csrf import csrf_exempt
-import json
+import json,time,os,sys
+from datetime import datetime
+sys.path.append('e:\\autotest\\Authority\\mysite')
+from face.testcase.maintest import test_ci_all_case
+from django.http import StreamingHttpResponse
+
 
 #登录
 def LoginUser(request):
@@ -78,9 +83,56 @@ def terminal_svr(request):
   if not request.user.is_authenticated():
         return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/admin/'))
   #doSomething to terminal svr
-  a = {}
-  a["result"] = "post_success"
-  return HttpResponse(json.dumps(a), content_type='application/json')
+  flag = request.POST['action']
+  if(flag == 'ci'):
+      return render(request, 'face/cirefresh.html')
+  if(flag=='wj'):
+      return render(request,'face/wjrefresh.html')
+  if(flag=='jp'):
+      return render(request, 'face/jprefresh.html')
 
-def flush(request):
-    pass
+@csrf_exempt
+def savefile(request):
+    abs_path = os.path.abspath('.')
+    upload_dir = abs_path + r'\face\uploadfile'
+    if (request.method == "POST"):
+        # save xlsx file
+        myfile = request.FILES.get("myfile", None)
+        if not myfile:
+            return HttpResponse("No file for upload")
+        destination = open(os.path.join(upload_dir, "ci.xlsx"), 'wb+')
+        for chunk in myfile.chunks():
+            destination.write(chunk)
+        destination.close()
+        return HttpResponse('上传成功')
+    return HttpResponse("上传失败")
+#跑测试
+@csrf_exempt
+def calc(request):
+    flag = request.POST['action']
+    if (flag == 'testci'):
+        pic_name = datetime.now().strftime("%Y%m%d%H%M%S%f")
+        pic_name_with_suffix = r'{filename}.html'.format(filename=pic_name)
+        test_ci_all_case(pic_name_with_suffix)
+        #HtmlFile = r'E:\\autotest\\Authority\\mysite\\face\\testcase\\result\\{filename}'.format(filename=pic_name_with_suffix)
+        resp = {'status':'200','detail':pic_name}
+        return HttpResponse(json.dumps(resp), content_type="application/json")
+        # if(os.path.exists(HtmlFile)):
+        #     return render(request, HtmlFile)
+@csrf_exempt
+def scanci(request):
+    pic_name = request.GET["action"]
+    pic_name_with_suffix = r'{filename}.html'.format(filename=pic_name)
+    HtmlFile = r'E:\\autotest\\Authority\\mysite\\face\\testcase\\result\\{filename}'.format(filename=pic_name_with_suffix)
+    def readfile(filename):
+        with open(filename, encoding='utf-8') as f:
+            while True:
+                c = f.read(512)
+                if c:
+                    yield c
+                else:
+                    break
+    response = StreamingHttpResponse(readfile(HtmlFile))
+    response['Content-Type'] ='application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(pic_name_with_suffix)
+    return response

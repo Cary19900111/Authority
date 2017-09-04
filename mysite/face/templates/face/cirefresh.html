@@ -1,0 +1,65 @@
+<!--
+<form action="/face/savefile/" method="post" enctype="multipart/form-data">
+    <label class="control-label">Select File</label>
+    <input id="input-1" class="file" type="file" name="myfile"/>
+    <br/>
+    <input type="submit" value="上传文件" onclick="showAndHidden2()"/>
+</form>
+-->
+<div class = "form-group">
+    <label class="control-label">附件上传</label>
+    <input type="file" name="myfile" id="fileupload">
+    <button type="button" class="btn btn-default" onclick="FileUpload()">开始上传附件</button>
+</div>
+<div id="status_up" class="collapse navbar-collapse"></div>
+<p>请先上传文件再点击开始测试</p>
+<div class="form-inline">
+    <button id="testci" type="button"  class="btn btn-success"  onclick="test(id)">开始测试</button>
+    <div id="status" class="collapse navbar-collapse"></div>
+    <button id="scanci" type="button"  class="btn btn-success"  value="1" style="display:none" onclick="DownLoad(value)">下载报告</button>
+    <!--
+    <a id="scanci" type="button"  class="col-xs-3"  value="1" style="display:none" href="{% url 'face:scanci'%}">下载报告</a>
+    -->
+</div>
+<script type="text/javascript">
+    function DownLoad(value)
+    {
+        window.location.href='scanci?action='+value;
+    }
+
+    function FileUpload()
+    {
+        var form_data = new FormData();
+        var file_info = $('#fileupload')[0].files[0];
+        form_data.append('myfile',file_info);
+        $.ajax({
+                url:"{% url 'face:savefile' %}",
+                type:'POST',
+                data: form_data,
+                processData: false,  // tell jquery not to process the data
+                contentType: false, // tell jquery not to set contentType
+                success: function(callback) {
+                   $("#status_up").html(callback);
+                }
+            }); // end ajax
+    }
+
+    function test(id)
+    {
+        $("#status").html("正在测试中...请稍后");
+        $.ajax({
+            url: './calc',
+            type: 'POST',
+            data: {'action':id},
+            timeout: 10000,
+            success: function(callback) {
+                    if(callback.status=='200'){
+                        $("#status").html("测试完成，请下载报告");
+                        var scan = document.getElementById("scanci");
+                        scan.value=callback.detail;
+                        scan.style.display="block";
+                    }
+                 }
+            })
+    }
+</script>

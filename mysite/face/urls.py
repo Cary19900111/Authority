@@ -12,7 +12,9 @@ urlpatterns = [
     url(r'^changepwd',views.ChangePassword, name='changepasswordurl'),
     url(r'^add', views.AddUser, name='adduserurl'),
     url(r'^terminal_svr', views.terminal_svr, name='terminal_svr'),
-    url(r'^flush', views.flush, name='flush'),
+    url(r'^savefile', views.savefile, name='savefile'),
+    url(r'^calc', views.calc, name='calc'),
+    url(r'^scanci', views.scanci, name='scanci'),
     # url(r'^$', views.IndexView.as_view(), name='index'),
     # # ?P<question_id> defines the name that will be used to identify the matched pattern;
     # url(r'^(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
