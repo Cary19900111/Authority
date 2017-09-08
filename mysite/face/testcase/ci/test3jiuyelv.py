@@ -25,7 +25,22 @@ class jiuyelv(unittest.TestCase):
         }
         department_response = requests.post(url="http://ciadmin.mycos.com//kz/typecompmodel.aspx", params=major_load_data)
         count = json.loads(department_response.text)['data']['res1'][0]['data'][0]['value']
-        self.assertEqual(count,'238-250')
+        self.assertEqual(count,'240-253')
+    def test_jiuyelv_department_another(self):
+        major_load_data = {
+            "year": "2016",
+            "version": '3',
+            "userid": '7261',
+            "universityid": '1435',
+            "statisticstype": '2_7',
+            "refproductid": '',
+            "productid": '1',
+            "itemid": '4',
+            "action": 'jiuyelv',
+        }
+        department_response = requests.post(url="http://ciadmin.mycos.com//kz/typecompmodel.aspx", params=major_load_data)
+        count = json.loads(department_response.text)['data']['res1'][0]['data'][0]['value']
+        self.assertEqual(count,'240-253')
     @classmethod
     def tearDownClass(cls):
         pass

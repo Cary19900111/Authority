@@ -51,14 +51,16 @@
             url: './calc',
             type: 'POST',
             data: {'action':id},
-            timeout: 10000,
             success: function(callback) {
-                    if(callback.status=='200'){
+                if(callback.status=='200'){
                         $("#status").html("测试完成，请下载报告");
                         var scan = document.getElementById("scanci");
                         scan.value=callback.detail;
                         scan.style.display="block";
-                    }
+                        }
+                else{
+                    $("#status").html("测试失败");
+                }
                  }
             })
     }

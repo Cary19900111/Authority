@@ -94,7 +94,7 @@ def terminal_svr(request):
 @csrf_exempt
 def savefile(request):
     abs_path = os.path.abspath('.')
-    upload_dir = abs_path + r'\face\uploadfile'
+    upload_dir = abs_path + r'\face\testcase\ci\uploadfile'
     if (request.method == "POST"):
         # save xlsx file
         myfile = request.FILES.get("myfile", None)
