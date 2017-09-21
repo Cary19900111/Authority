@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json,time,os,sys
 from datetime import datetime
 sys.path.append('e:\\autotest\\Authority\\mysite')
-from face.testcase.maintest import test_ci_all_case
+from face.testcase.maintest import test_ci_all_case,test_jp_all_case
 from django.http import StreamingHttpResponse
 
 
@@ -106,6 +106,21 @@ def savefile(request):
         destination.close()
         return HttpResponse('上传成功')
     return HttpResponse("上传失败")
+@csrf_exempt
+def savejpfile(request):
+    abs_path = os.path.abspath('.')
+    upload_dir = abs_path + r'\face\testcase\jp\uploadfile'
+    if (request.method == "POST"):
+        # save xlsx file
+        myfile = request.FILES.get("myfile", None)
+        if not myfile:
+            return HttpResponse("No file for upload")
+        destination = open(os.path.join(upload_dir, "jp.xlsx"), 'wb+')
+        for chunk in myfile.chunks():
+            destination.write(chunk)
+        destination.close()
+        return HttpResponse('上传成功')
+    return HttpResponse("上传失败")
 #跑测试
 @csrf_exempt
 def calc(request):
@@ -119,6 +134,13 @@ def calc(request):
         return HttpResponse(json.dumps(resp), content_type="application/json")
         # if(os.path.exists(HtmlFile)):
         #     return render(request, HtmlFile)
+    if(flag=='testjp'):
+        pic_name = datetime.now().strftime("%Y%m%d%H%M%S%f")
+        pic_name_with_suffix = r'{filename}.html'.format(filename=pic_name)
+        test_jp_all_case(pic_name_with_suffix)
+        #HtmlFile = r'E:\\autotest\\Authority\\mysite\\face\\testcase\\result\\{filename}'.format(filename=pic_name_with_suffix)
+        resp = {'status':'200','detail':pic_name}
+        return HttpResponse(json.dumps(resp), content_type="application/json")
 @csrf_exempt
 def scanci(request):
     pic_name = request.GET["action"]

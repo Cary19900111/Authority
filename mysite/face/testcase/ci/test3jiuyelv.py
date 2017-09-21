@@ -6,7 +6,7 @@ from selenium import webdriver
 import requests
 import json
 __author__ = 'caryr'
-#@unittest.skip("test3")
+@unittest.skip("test3")
 class jiuyelv(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -8,7 +8,7 @@ from ..ci.common.ParaTestCase import ParametrizedTestCase
 from .dal.populationSample import PopulationSample
 
 __author__ = 'caryr'
-#@unittest.skip("test2")
+@unittest.skip("test2")
 class Testjiuyelv(ParametrizedTestCase):
     @classmethod
     def setUpClass(cls):

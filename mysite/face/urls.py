@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^add', views.AddUser, name='adduserurl'),
     url(r'^terminal_svr', views.terminal_svr, name='terminal_svr'),
     url(r'^savefile', views.savefile, name='savefile'),
+    url(r'^savejpfile',views.savejpfile,name='savejpfile'),
     url(r'^calc', views.calc, name='calc'),
     url(r'^scanci', views.scanci, name='scanci'),
     # url(r'^$', views.IndexView.as_view(), name='index'),
