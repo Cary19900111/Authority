@@ -39,7 +39,7 @@ def get_jp_information():
     for rx in range(sheet_half.max_row-1):
         uni = {}
         uni['ip']  = sheet_half.cell(row=rx + 2, column=1).value
-        uni['account'] = sheet_half.cell(row=rx + 2, column=2).value
+        uni['superpassword'] = sheet_half.cell(row=rx + 2, column=2).value
         uni['password'] = sheet_half.cell(row=rx + 2, column=3).value
         uni['name'] = sheet_half.cell(row=rx + 2, column=4).value
         uni_all.append(uni)
@@ -62,7 +62,7 @@ def test_ci_all_case(filename):
         #     testunit.addTests(test_case)
         fp = open(HtmlFile, "wb")
         for university in university_list:
-            runner = HTMLTestRunner.HTMLTestRunner(stream=fp, title=str(university['code']), description=u"测试报告")
+            runner = HTMLTestRunner.HTMLTestRunner(stream=fp, title=str(university['name']), description=u"测试报告")
             suite = unittest.TestSuite()
             # addTest既可以是suite，也可以是tests
             #suite.addTest(ParametrizedTestCase.parametrize(Testjiuyelv, param=university))

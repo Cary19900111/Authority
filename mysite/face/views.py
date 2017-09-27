@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json,time,os,sys
 from datetime import datetime
 sys.path.append('e:\\autotest\\Authority\\mysite')
-from face.testcase.maintest import test_ci_all_case,test_jp_all_case
+from .testcase.maintest import test_ci_all_case,test_jp_all_case
 from django.http import StreamingHttpResponse
 
 
@@ -134,7 +134,7 @@ def calc(request):
         return HttpResponse(json.dumps(resp), content_type="application/json")
         # if(os.path.exists(HtmlFile)):
         #     return render(request, HtmlFile)
-    if(flag=='testjp'):
+    if(flag == 'testjp'):
         pic_name = datetime.now().strftime("%Y%m%d%H%M%S%f")
         pic_name_with_suffix = r'{filename}.html'.format(filename=pic_name)
         test_jp_all_case(pic_name_with_suffix)
@@ -145,7 +145,10 @@ def calc(request):
 def scanci(request):
     pic_name = request.GET["action"]
     pic_name_with_suffix = r'{filename}.html'.format(filename=pic_name)
-    HtmlFile = r'E:\\autotest\\Authority\\mysite\\face\\testcase\\result\\{filename}'.format(filename=pic_name_with_suffix)
+    abs_path = os.path.abspath('.')
+    result_path = r'\\face\\testcase\\result\\{filename}'.format(filename=pic_name_with_suffix)
+    HtmlFile = abs_path+result_path
+    #HtmlFile = r'E:\\autotest\\Authority\\mysite\\face\\testcase\\result\\{filename}'.format(filename=pic_name_with_suffix)
     def readfile(filename):
         with open(filename, encoding='utf-8') as f:
             while True:
@@ -155,6 +158,6 @@ def scanci(request):
                 else:
                     break
     response = StreamingHttpResponse(readfile(HtmlFile))
-    response['Content-Type'] ='application/octet-stream'
+    response['Content-Type'] ='text/html;application/octet-stream;charset=UTF-8'
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(pic_name_with_suffix)
     return response
