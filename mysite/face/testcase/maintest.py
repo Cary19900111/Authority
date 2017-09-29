@@ -8,7 +8,40 @@ from .jp.testpublishtask import TestPublish
 from datetime import datetime
 from .ci.common.ParaTestCase import ParametrizedTestCase
 from openpyxl import load_workbook
+from bs4 import BeautifulSoup
 
+
+def modify_html(html_path):
+    html_file = open(html_path, 'rb')
+    html_page = html_file.read().decode("utf-8")
+    html_soup = BeautifulSoup(html_page, "html.parser")
+    title_list = html_soup.find_all('title')  # 查询有几个学校
+    # error_list = html_soup.find_all('tr',attrs={'class':'none'})
+    # error_list = html_soup.find_all('a', attrs={'class': 'popup_link'})
+    html_file.close()
+    error_open = html_soup.find_all('div', attrs={'class': 'popup_window'})
+    # error_content = html_soup.find_all('div', attrs={'class': 'popup_window'})
+    error_content_and_close = html_soup.find_all('a', attrs={'onfocus': 'this.blur();'})
+    float = 2.0
+    for index in range(len(error_open)):
+        float += 0.1
+        id_expect = "div_ft" + str(float)
+        href_expect = "javascript:showTestDetail('div_ft" + str(float) + "')"
+        onclick_expect = "document.getElementById('div_ft" + str(float) + "').style.display = 'none'"
+        # href="div_ft1.3"
+        # href = "javascript:showTestDetail('div_ft1.3')"
+        # onclick = "document.getElementById('div_ft1.3').style.display = 'none'"
+        error_open[index]['id'] = id_expect
+        error_content_and_close[index * 2]['href'] = href_expect
+        error_content_and_close[index * 2 + 1]['onclick'] = onclick_expect
+    html_return = html_soup.prettify()
+    html_result = html_return.encode("utf-8")
+
+    # def saveHtml(file_name, file_content):
+    #    注意windows文件命名的禁用符，比如 /
+    with open("text1" + ".html", "wb") as f:
+        #   写文件用bytes而不是str，所以要转码
+        f.write(html_result)
 def get_ci_information():
     uni_all=[]
     abs_path = os.getcwd()
