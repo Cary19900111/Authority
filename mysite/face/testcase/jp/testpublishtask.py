@@ -6,11 +6,27 @@ from ..ci.common.ParaTestCase import ParametrizedTestCase
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
+import functools
+result_test_flag = False
 
+# class SkipTest(Exception):
+#     '''Raise this exception in a test to skip it.'''
+# def skip_result_if_task_exist(func):
+#     """
+#     Conditionally skip a test.
+#     """
+#     print("my_skip")
+#     def decorator(self,*args,**kwargs):
+#         if(self.flag == False):
+#             return func(self,*args,**kwargs)
+#         else:
+#             return SkipTest
+#     return decorator
 
 class TestPublish(ParametrizedTestCase):
     @classmethod
     def setUpClass(cls):
+        cls.flag = False
         cls.driver = webdriver.Chrome()
         cls.driver.implicitly_wait(5)
         cls.driver.maximize_window()
@@ -106,11 +122,13 @@ class TestPublish(ParametrizedTestCase):
         self.driver.find_element_by_css_selector("li[stype^='1']").click()
         if(flag=='result'):
             time.sleep(2)
+            subjectitem = self.driver.find_element_by_css_selector("div[class^='editOption']")
+            ActionChains(self.driver).move_to_element(subjectitem).perform()
             set_score_a = self.driver.find_element_by_css_selector("a[class^='setScore']")
-            ActionChains(self.driver).move_to_element(set_score_a).perform()
             #self.driver.execute_script("arguments[0].style.display='inline';",set_score_a)
             self.driver.execute_script("arguments[0].setAttribute('style', arguments[1]);", set_score_a,
                                    "visibility: visible;")
+            time.sleep(1)
             set_score_a.click()
             time.sleep(0.5)
             #self.driver.switch_to.default_content()
@@ -394,7 +412,25 @@ class TestPublish(ParametrizedTestCase):
             self.assertNotIn("",name_list)
 
     #@unittest.skip("result")
-    def test_ca_create_result_template(self):
+    def test_ca_judge_result_test(self):
+        self.direct_to_homepage()
+        time.sleep(0.5)
+        self.driver.find_element_by_css_selector("div[class^='navList js_result']").click()
+        self.driver.find_element_by_css_selector("a[class^='js_result_q NoSemester']").click()
+        time.sleep(1)
+        self.driver.switch_to.frame("iframepage")
+        task_tbody = self.driver.find_element_by_css_selector("tbody[class^='jqtransformdone']")
+        task = task_tbody.find_elements_by_css_selector("tr td")
+        if(len(task)>2):
+            globals()['result_test_flag'] = True
+            self.assertEqual("exist"," result task")
+        else:
+            self.assertEqual("test","test")
+
+    #@unittest.skip("result")
+    def test_cb_create_result_template(self):
+        if(globals()['result_test_flag'] == True):
+            self.assertTrue(False,"已有结果性评价任务")
         self.direct_to_homepage()
         time.sleep(0.5)
         self.driver.find_element_by_css_selector("div[class^='navList js_result']").click()
@@ -420,7 +456,9 @@ class TestPublish(ParametrizedTestCase):
             self.assertEqual("1","Create Template Fail")
 
     @unittest.skip("result")
-    def test_cb_create_result(self):
+    def test_cc_create_result(self):
+        if(self.flag == True):
+            self.assertTrue(False,"已有结果性评价任务")
         self.direct_to_homepage()
         time.sleep(0.5)
         self.driver.find_element_by_css_selector("div[class^='navList js_result']").click()
@@ -477,7 +515,9 @@ class TestPublish(ParametrizedTestCase):
         self.assertEqual("publishCRresult", task_name)
 
     @unittest.skip("result")
-    def test_cc_answer_result(self):
+    def test_cd_answer_result(self):
+        if(self.flag == True):
+            self.assertTrue(False,"已有结果性评价任务")
         self.direct_to_homepage()
         self.driver.find_element_by_css_selector("div[class^='navList js_result']").click()
         self.driver.find_element_by_css_selector("a[class^='js_result_q NoSemester']").click()
@@ -534,7 +574,9 @@ class TestPublish(ParametrizedTestCase):
             self.assertEquals("have Task","No Task")
 
     @unittest.skip("result")
-    def test_cd_delete_result(self):
+    def test_ce_delete_result(self):
+        if(self.flag == True):
+            self.assertTrue(False,"已有结果性评价任务")
         self.direct_to_homepage()
         time.sleep(0.5)
         self.driver.find_element_by_css_selector("div[class^='navList js_result']").click()
@@ -570,7 +612,9 @@ class TestPublish(ParametrizedTestCase):
             self.assertNotEqual("publishCRresult",task_name)
 
     #@unittest.skip("result")
-    def test_cd_delete_template(self):
+    def test_cf_delete_template(self):
+        if(self.flag == True):
+            self.assertTrue(False,"已有结果性评价任务")
         self.direct_to_homepage()
         time.sleep(0.5)
         self.driver.find_element_by_css_selector("div[class^='navList js_result']").click()
