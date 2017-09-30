@@ -9,6 +9,7 @@ from datetime import datetime
 sys.path.append('e:\\autotest\\Authority\\mysite')
 from .testcase.maintest import test_ci_all_case,test_jp_all_case
 from django.http import StreamingHttpResponse
+from bs4 import BeautifulSoup
 
 
 #登录
@@ -141,6 +142,49 @@ def calc(request):
         #HtmlFile = r'E:\\autotest\\Authority\\mysite\\face\\testcase\\result\\{filename}'.format(filename=pic_name_with_suffix)
         resp = {'status':'200','detail':pic_name}
         return HttpResponse(json.dumps(resp), content_type="application/json")
+
+
+def modify_html(html_path):
+    '''修改error的展开'''
+    html_file = open(html_path, 'rb+')
+    html_page = html_file.read().decode("utf-8")
+    html_soup = BeautifulSoup(html_page, "html.parser")
+    #title_list = html_soup.find_all('title')  # 查询有几个学校
+    # error_list = html_soup.find_all('tr',attrs={'class':'none'})
+    # error_list = html_soup.find_all('a', attrs={'class': 'popup_link'})
+    html_file.truncate()
+    html_file.close()
+    error_open = html_soup.find_all('div', attrs={'class': 'popup_window'})
+    # error_content = html_soup.find_all('div', attrs={'class': 'popup_window'})
+    error_content_and_close = html_soup.find_all('a', attrs={'onfocus': 'this.blur();'})
+    float = 2.0
+    for index in range(len(error_open)):
+        float += 0.1
+        id_expect = "div_ft" + str(float)
+        href_expect = "javascript:showTestDetail('div_ft" + str(float) + "')"
+        onclick_expect = "document.getElementById('div_ft" + str(float) + "').style.display = 'none'"
+        # href="div_ft1.3"
+        # href = "javascript:showTestDetail('div_ft1.3')"
+        # onclick = "document.getElementById('div_ft1.3').style.display = 'none'"
+        error_open[index]['id'] = id_expect
+        error_content_and_close[index * 2]['href'] = href_expect
+        error_content_and_close[index * 2 + 1]['onclick'] = onclick_expect
+    html_return = html_soup.prettify()
+    html_result = html_return.encode("utf-8")
+    with open(html_path,  "wb") as f:
+        f.write(html_result)
+        f.close()
+
+def readfile(filename):
+    modify_html(filename)
+    with open(filename, encoding='utf-8') as f:
+        while True:
+            c = f.read(512)
+            if c:
+                yield c
+            else:
+                break
+
 @csrf_exempt
 def scanci(request):
     pic_name = request.GET["action"]
@@ -149,15 +193,8 @@ def scanci(request):
     result_path = r'\\face\\testcase\\result\\{filename}'.format(filename=pic_name_with_suffix)
     HtmlFile = abs_path+result_path
     #HtmlFile = r'E:\\autotest\\Authority\\mysite\\face\\testcase\\result\\{filename}'.format(filename=pic_name_with_suffix)
-    def readfile(filename):
-        with open(filename, encoding='utf-8') as f:
-            while True:
-                c = f.read(512)
-                if c:
-                    yield c
-                else:
-                    break
     response = StreamingHttpResponse(readfile(HtmlFile))
+    #  response = StreamingHttpResponse(readfile(HtmlFile))
     response['Content-Type'] ='text/html;application/octet-stream;charset=UTF-8'
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(pic_name_with_suffix)
     return response

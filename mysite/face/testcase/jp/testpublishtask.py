@@ -65,7 +65,6 @@ class TestPublish(ParametrizedTestCase):
         cls.help_close_div = cls.driver.find_element_by_css_selector("div[class^='helpInfo']")
         cls.help_close_span = cls.help_close_div.find_element_by_css_selector("span")
         cls.help_close_span.click()
-
 # 答题
     def answer_question(self,driver2):
         # 单选
@@ -514,7 +513,7 @@ class TestPublish(ParametrizedTestCase):
         self.driver.switch_to.default_content()
         self.assertEqual("publishCRresult", task_name)
 
-    @unittest.skip("result")
+    #@unittest.skip("result")
     def test_cd_answer_result(self):
         if(self.flag == True):
             self.assertTrue(False,"已有结果性评价任务")
