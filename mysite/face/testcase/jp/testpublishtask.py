@@ -40,8 +40,11 @@ class TestPublish(ParametrizedTestCase):
         cls.password.send_keys(cls.para['superpassword'])
         cls.login_button.click()
         close_list = cls.driver.find_elements_by_css_selector("button[i='close']")
-        close_list[1].click()
-        close_list[0].click()
+        if(len(close_list)>1):
+            close_list[1].click()
+            close_list[0].click()
+        else:
+            close_list[0].click()
         cls.driver.find_element_by_css_selector("div[class^='navList js_system']").click()
         cls.driver.find_element_by_css_selector("a[class^='js_system_role NoSemester']").click()
         cls.driver.switch_to.frame("iframeBody")
@@ -60,8 +63,11 @@ class TestPublish(ParametrizedTestCase):
         cls.password.send_keys(cls.para['password'])
         cls.login_button.click()
         close_list = cls.driver.find_elements_by_css_selector("button[i='close']")
-        close_list[1].click()
-        close_list[0].click()
+        if(len(close_list)>1):
+            close_list[1].click()
+            close_list[0].click()
+        else:
+            close_list[0].click()
         cls.help_close_div = cls.driver.find_element_by_css_selector("div[class^='helpInfo']")
         cls.help_close_span = cls.help_close_div.find_element_by_css_selector("span")
         cls.help_close_span.click()
@@ -117,19 +123,24 @@ class TestPublish(ParametrizedTestCase):
         return 1
 
     def create_question(self,flag=None):
-        time.sleep(0.5)
+        WebDriverWait(self.driver,10).until(lambda x:x.find_element_by_css_selector("li[stype^='1']"))
+        time.sleep(1)
         self.driver.find_element_by_css_selector("li[stype^='1']").click()
+        time.sleep(0.5)
         if(flag=='result'):
             time.sleep(2)
             subjectitem = self.driver.find_element_by_css_selector("div[class^='editOption']")
-            ActionChains(self.driver).move_to_element(subjectitem).perform()
+            #ActionChains(self.driver).move_to_element(subjectitem).perform()
+            time.sleep(1.5)
+            #用visibility隐藏的元素可直接用js进行点击
             set_score_a = self.driver.find_element_by_css_selector("a[class^='setScore']")
             #self.driver.execute_script("arguments[0].style.display='inline';",set_score_a)
-            self.driver.execute_script("arguments[0].setAttribute('style', arguments[1]);", set_score_a,
-                                   "visibility: visible;")
+            # self.driver.execute_script("arguments[0].setAttribute('style', arguments[1]);", set_score_a,
+            #                        "visibility: visible;")]
+            self.driver.execute_script("arguments[0].click();",set_score_a)
             time.sleep(1)
-            set_score_a.click()
-            time.sleep(0.5)
+            #set_score_a.click()
+            #time.sleep(0.5)
             #self.driver.switch_to.default_content()
             score_form = self.driver.find_element_by_id("setscore_form")
             score_input = score_form.find_element_by_css_selector("ul li+li input")
@@ -160,7 +171,17 @@ class TestPublish(ParametrizedTestCase):
             pass
 # 即时性创建-回答-删除问卷
 
-    @unittest.skip("instantaneity")
+    def element_exist(self,dr,flag,express):
+        if(flag=='css'):
+            try:
+                close_list = dr.find_element_by_css_selector("button[i='close']")
+                return 1
+            except:
+                return 0
+        else:
+            return 0
+
+    #@unittest.skip("instantaneity")
     def test_aa_create_instantaneity(self):
         #self.direct_to_homepage()
         self.driver.find_element_by_css_selector("div[class^='navList js_general']").click()
@@ -222,7 +243,7 @@ class TestPublish(ParametrizedTestCase):
         self.driver.switch_to.default_content()
         self.assertIn("publishCRinstantaneity",name_list)
 
-    @unittest.skip("instantaneity")
+    #@unittest.skip("instantaneity")
     def test_ab_answer_instantaneity(self):
         self.direct_to_homepage()
         self.driver.find_element_by_css_selector("div[class^='navList js_general']").click()
@@ -233,14 +254,14 @@ class TestPublish(ParametrizedTestCase):
         link_text_obj = self.driver.find_element_by_id("txtLink")
         link = link_text_obj.text
         driver2 = webdriver.Chrome()
-        driver2.implicitly_wait(10)
+        driver2.implicitly_wait(2)
         driver2.get(link)
         self.answer_question(driver2)
         driver2.quit()
         self.driver.switch_to.default_content()
-        time.sleep(4)
+        time.sleep(6)
         self.driver.find_element_by_css_selector("a[class^='js_general_q NoSemester']").click()
-        time.sleep(1)
+        time.sleep(4)
         self.driver.switch_to.frame("iframepage")
         table_instantaneity = self.driver.find_element_by_id("queryresult")
         task_tr = table_instantaneity.find_element_by_css_selector("div table tbody tr")
@@ -249,7 +270,7 @@ class TestPublish(ParametrizedTestCase):
         self.driver.switch_to.default_content()
         self.assertEqual(task_answer_count,'1 ')
 
-    @unittest.skip("instantaneity")
+    #@unittest.skip("instantaneity")
     def test_ac_delete_instantaneity(self):
         self.direct_to_homepage()
         self.driver.find_element_by_css_selector("div[class^='navList js_general']").click()
@@ -279,7 +300,7 @@ class TestPublish(ParametrizedTestCase):
         else:
             self.assertEqual("Not in list","Not in list")
 
-    @unittest.skip("process")
+    #@unittest.skip("process")
     def test_ba_create_process(self):
         self.direct_to_homepage()
         self.driver.find_element_by_css_selector("div[class^='navList js_process']").click()
@@ -290,19 +311,23 @@ class TestPublish(ParametrizedTestCase):
         self.driver.find_element_by_css_selector("input[class^='js_name']").send_keys("publishCRprocess")
         self.driver.find_element_by_css_selector("a[class^='mr0 js_nextstep release']").click()
         # 等待题型加载
-        time.sleep(3)
-        self.driver.find_element_by_css_selector("li[stype^='1']").click()
+        time.sleep(2)
+        #self.driver.find_element_by_css_selector("li[stype^='1']").click()
+        self.create_question()
         self.next_parent = self.driver.find_element_by_id("designSurvey")
         time.sleep(1)
         self.next_step = self.next_parent.find_elements_by_css_selector("a")[3]
         ActionChains(self.driver).click(self.next_step).perform()
         self.driver.find_element_by_css_selector("a[class^='add respondentAdd btnAdd']").click()
         self.driver.switch_to.default_content()
-        all_div = self.driver.find_element_by_css_selector("div[class^='clearfix']")
-        time.sleep(1)
-        all_div.find_element_by_css_selector("p span a").click()
+        # all_div = self.driver.find_element_by_css_selector("div[class^='clearfix']")
+        # time.sleep(1)
+        # all_div.find_element_by_css_selector("p span a").click()
+        department_list = self.driver.find_elements_by_css_selector("p[class^='chkitemwrapper']")
+        for i in range(0,6):
+            department_list[i].find_element_by_css_selector("span a").click()
         self.driver.find_element_by_css_selector("input[class^='dlgOK confirm'][value^='确定']").click()
-        time.sleep(6)
+        time.sleep(4)
         self.driver.switch_to.frame("iframepage")
         self.driver.find_element_by_id("btnSend").click()
         WebDriverWait(self.driver,10).until(lambda x:x.find_element_by_id("txtStart"))
@@ -310,7 +335,7 @@ class TestPublish(ParametrizedTestCase):
         self.driver.find_element_by_id("txtEnd").send_keys("2018-09-19 17:30")
         self.driver.find_element_by_id("js_publish").click()
         #WebDriverWait(self.driver, 20).until(lambda x: x.find_element_by_css_selector("div[class^='main tip']"))
-        time.sleep(12)
+        time.sleep(5)
         self.driver.switch_to.default_content()
         self.driver.find_element_by_css_selector("a[class^='js_process_q NoSemester']").click()
         self.driver.switch_to.frame("iframepage")
@@ -321,7 +346,7 @@ class TestPublish(ParametrizedTestCase):
         self.driver.switch_to.default_content()
         self.assertIn("publishCRprocess", name_list)
 
-    @unittest.skip("process")
+    #@unittest.skip("process")
     def test_bb_answer_process(self):
         self.direct_to_homepage()
         self.driver.find_element_by_css_selector("div[class^='navList js_process']").click()
@@ -340,16 +365,17 @@ class TestPublish(ParametrizedTestCase):
             student_num = student_num_td.text
 #新开浏览器答题
         driver2 = webdriver.Chrome()
-        driver2.implicitly_wait(10)
-        driver2.get(self.para['ip'])
+        driver2.implicitly_wait(5)
+        driver2.get("http://"+self.para['ip'])
         username = driver2.find_element_by_id("txtUserName")
         password = driver2.find_element_by_id("txtPassword")
         login_button = driver2.find_element_by_css_selector("input[value^='登    录']")
         username.send_keys(student_num)
         password.send_keys("00606f295a45485ba63671b6f8612213@")
         login_button.click()
-        close_list = driver2.find_element_by_css_selector("button[i='close']")
-        close_list.click()
+        if(self.element_exist(driver2,"css","button[i='close'])")):
+            close_list = driver2.find_element_by_css_selector("button[i='close']")
+            close_list.click()
 #新开的网页
         driver2.switch_to.frame("iframeBody")
         driver2.find_element_by_id("txtName").send_keys("publishCRprocess")
@@ -370,7 +396,7 @@ class TestPublish(ParametrizedTestCase):
                 driver2.quit()
                 break
 #查看结果
-        time.sleep(4)
+        time.sleep(10)
         self.driver.switch_to.default_content()
         self.driver.find_element_by_css_selector("a[class^='js_process_q NoSemester']").click()
         self.driver.switch_to.frame("iframepage")
@@ -383,7 +409,7 @@ class TestPublish(ParametrizedTestCase):
         real_result = pattern.findall(task_answer_count)[0]
         self.assertEqual(real_result,'1')
 
-    @unittest.skip("process")
+    #@unittest.skip("process")
     def test_bc_delete_process(self):
         self.direct_to_homepage()
         time.sleep(0.5)
@@ -454,7 +480,7 @@ class TestPublish(ParametrizedTestCase):
         else:
             self.assertEqual("1","Create Template Fail")
 
-    @unittest.skip("result")
+    #@unittest.skip("result")
     def test_cc_create_result(self):
         if(self.flag == True):
             self.assertTrue(False,"已有结果性评价任务")
@@ -541,8 +567,9 @@ class TestPublish(ParametrizedTestCase):
             username.send_keys(student_num)
             password.send_keys("00606f295a45485ba63671b6f8612213@")
             login_button.click()
-            close_list = driver2.find_element_by_css_selector("button[i='close']")
-            close_list.click()
+            if(self.element_exist(driver2,'css',"button[i='close']")):
+                close_list = driver2.find_element_by_css_selector("button[i='close']")
+                close_list.click()
             # 新开的网页
             driver2.switch_to.frame("iframepage")
             driver2.find_element_by_id("txtName").send_keys("publishCRresult")
@@ -572,7 +599,7 @@ class TestPublish(ParametrizedTestCase):
         else:
             self.assertEquals("have Task","No Task")
 
-    @unittest.skip("result")
+    #@unittest.skip("result")
     def test_ce_delete_result(self):
         if(self.flag == True):
             self.assertTrue(False,"已有结果性评价任务")
