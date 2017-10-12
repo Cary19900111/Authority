@@ -27,6 +27,9 @@ class TestPublish(ParametrizedTestCase):
     @classmethod
     def setUpClass(cls):
         cls.flag = False
+        cls.instant_task = cls.para['name'][0:3]+"CRinstant"
+        cls.process_task = cls.para['name'][0:3]+"CRprocess"
+        cls.result_task = cls.para['name'][0:3]+"CRresult"
         cls.driver = webdriver.Chrome()
         cls.driver.implicitly_wait(5)
         cls.driver.maximize_window()
@@ -192,7 +195,7 @@ class TestPublish(ParametrizedTestCase):
         self.driver.switch_to.frame("iframepage")
         self.driver.find_element_by_css_selector("a[class^='add js_create']").click()
         #self.driver.find_element_by_css_selector("a[class^='jqTransformRadio jqTransformChecked']").click()
-        self.driver.find_element_by_css_selector("input[class^='js_name']").send_keys("publishCRinstantaneity")
+        self.driver.find_element_by_css_selector("input[class^='js_name']").send_keys(self.instant_task)
         self.driver.find_element_by_css_selector("a[class^='mr0 js_nextstep release']").click()
         #等待题型加载
         self.create_question()
@@ -241,7 +244,7 @@ class TestPublish(ParametrizedTestCase):
         for task_name_a in task_name_a_list:
             name_list.append(task_name_a.text)
         self.driver.switch_to.default_content()
-        self.assertIn("publishCRinstantaneity",name_list)
+        self.assertIn(self.instant_task,name_list)
 
     #@unittest.skip("instantaneity")
     def test_ab_answer_instantaneity(self):
@@ -279,7 +282,7 @@ class TestPublish(ParametrizedTestCase):
         table_instantaneity = self.driver.find_element_by_id("queryresult")
         task_tr = table_instantaneity.find_element_by_css_selector("div table tbody tr")
         task_td = task_tr.find_elements_by_css_selector("td")
-        if(task_td[2].text == 'publishCRinstantaneity'):
+        if(task_td[2].text == self.instant_task):
             ActionChains(self.driver).move_to_element(task_td[0]).click().perform()
             self.driver.find_element_by_css_selector("a[class^='js_batch_delete']").click()
             self.driver.switch_to.default_content()
@@ -294,7 +297,7 @@ class TestPublish(ParametrizedTestCase):
                 name_list.append(task_name_a.text)
             self.driver.switch_to.default_content()
             if('' not in name_list):
-                self.assertNotIn("publishCRinstantaneity",name_list)
+                self.assertNotIn(self.instant_task,name_list)
             else:
                 self.assertNotIn("",name_list)
         else:
@@ -308,7 +311,7 @@ class TestPublish(ParametrizedTestCase):
         time.sleep(3)
         self.driver.switch_to.frame("iframepage")
         self.driver.find_element_by_css_selector("a[class^='add js_create']").click()
-        self.driver.find_element_by_css_selector("input[class^='js_name']").send_keys("publishCRprocess")
+        self.driver.find_element_by_css_selector("input[class^='js_name']").send_keys(self.process_task)
         self.driver.find_element_by_css_selector("a[class^='mr0 js_nextstep release']").click()
         # 等待题型加载
         time.sleep(2)
@@ -324,7 +327,8 @@ class TestPublish(ParametrizedTestCase):
         # time.sleep(1)
         # all_div.find_element_by_css_selector("p span a").click()
         department_list = self.driver.find_elements_by_css_selector("p[class^='chkitemwrapper']")
-        for i in range(0,6):
+        time.sleep(2)
+        for i in range(0,min(6,len(department_list)-1)):
             department_list[i].find_element_by_css_selector("span a").click()
         self.driver.find_element_by_css_selector("input[class^='dlgOK confirm'][value^='确定']").click()
         time.sleep(4)
@@ -344,7 +348,7 @@ class TestPublish(ParametrizedTestCase):
         for task_name_a in task_name_a_list:
             name_list.append(task_name_a.text)
         self.driver.switch_to.default_content()
-        self.assertIn("publishCRprocess", name_list)
+        self.assertIn(self.process_task, name_list)
 
     #@unittest.skip("process")
     def test_bb_answer_process(self):
@@ -355,7 +359,7 @@ class TestPublish(ParametrizedTestCase):
         table_instantaneity = self.driver.find_element_by_id("queryresult")
         task_tr = table_instantaneity.find_element_by_css_selector("div table tbody tr")
         task_td = task_tr.find_elements_by_css_selector("td")
-        if(task_td[2].text == 'publishCRprocess'):
+        if(task_td[2].text == self.process_task):
             task_tr.find_element_by_css_selector("a[data-title^='查看结果']").click()
             self.driver.find_element_by_css_selector("a[class^='toAddSearchHref'][data-title='查看结果']").click()
             task_student_ul = self.driver.find_element_by_css_selector("ul[class^='createNav setCollect chooseCreateMode js_nav']")
@@ -378,7 +382,7 @@ class TestPublish(ParametrizedTestCase):
             close_list.click()
 #新开的网页
         driver2.switch_to.frame("iframeBody")
-        driver2.find_element_by_id("txtName").send_keys("publishCRprocess")
+        driver2.find_element_by_id("txtName").send_keys(self.process_task)
         time.sleep(0.5)
         driver2.find_element_by_id("btnName").click()
         time.sleep(1)
@@ -391,7 +395,7 @@ class TestPublish(ParametrizedTestCase):
         time.sleep(3)
         for window_index in driver2.window_handles:
             driver2.switch_to.window(window_index)
-            if(driver2.title=='publishCRprocess'):
+            if(driver2.title==self.process_task):
                 self.answer_question(driver2)
                 driver2.quit()
                 break
@@ -419,7 +423,7 @@ class TestPublish(ParametrizedTestCase):
         table_instantaneity = self.driver.find_element_by_id("queryresult")
         task_tr = table_instantaneity.find_element_by_css_selector("div table tbody tr")
         task_td = task_tr.find_elements_by_css_selector("td")
-        if(task_td[2].text == 'publishCRprocess'):
+        if(task_td[2].text == self.process_task):
             ActionChains(self.driver).move_to_element(task_td[0]).click().perform()
             self.driver.find_element_by_css_selector("a[class^='js_batch_delete']").click()
             self.driver.switch_to.default_content()
@@ -432,7 +436,7 @@ class TestPublish(ParametrizedTestCase):
             name_list.append(task_name_a.text)
         self.driver.switch_to.default_content()
         if('' not in name_list):
-            self.assertNotIn("publishCRprocess",name_list)
+            self.assertNotIn(self.process_task,name_list)
         else:
             self.assertNotIn("",name_list)
 
@@ -463,12 +467,12 @@ class TestPublish(ParametrizedTestCase):
         self.driver.switch_to.frame("iframeBody")
         self.driver.find_element_by_css_selector("a[class^='add js_add']").click()
         self.driver.switch_to.default_content()
-        self.driver.find_element_by_css_selector("input[class=' required js_name']").send_keys("TemplateCRresult")
+        self.driver.find_element_by_css_selector("input[class=' required js_name']").send_keys(self.result_task)
         self.driver.find_element_by_css_selector("input[class^='js_ok confirm']").click()
         self.driver.switch_to.frame("iframeBody")
         templeta_table = self.driver.find_element_by_css_selector("tbody[class='jqtransformdone']")
         first_template_td = templeta_table.find_elements_by_css_selector("tr td")
-        if(len(first_template_td)>2 and first_template_td[1].text=='TemplateCRresult'):
+        if(len(first_template_td)>2 and first_template_td[1].text==self.result_task):
             first_template_td[2].find_element_by_css_selector('a').click()
             self.create_question(flag='result')
             design_button = self.driver.find_element_by_id("designSurvey")
@@ -492,7 +496,7 @@ class TestPublish(ParametrizedTestCase):
         self.driver.switch_to.frame("iframepage")
         self.driver.find_element_by_css_selector("a[class^='add js_createtask']").click()
         self.driver.find_element_by_css_selector("tr[class^='createTr']").click()
-        self.driver.find_element_by_css_selector("input[class^='js_name']").send_keys("publishCRresult")
+        self.driver.find_element_by_css_selector("input[class^='js_name']").send_keys(self.result_task)
         self.driver.find_element_by_css_selector("a[class^='mr0 js_nextstep release']").click()
         #选择调查对象
         #WebDriverWait(self.driver,10).until(lambda x: x.find_element_by_css_selector("div[class^='filtrateShowChoose formStyle']"))
@@ -537,7 +541,7 @@ class TestPublish(ParametrizedTestCase):
         task = task_tbody.find_elements_by_css_selector("tr td")
         task_name = task[2].text
         self.driver.switch_to.default_content()
-        self.assertEqual("publishCRresult", task_name)
+        self.assertEqual(self.result_task, task_name)
 
     #@unittest.skip("result")
     def test_cd_answer_result(self):
@@ -550,7 +554,7 @@ class TestPublish(ParametrizedTestCase):
         table_result = self.driver.find_element_by_id("resultData")
         task_tr = table_result.find_element_by_css_selector("table tbody tr")
         task_td = task_tr.find_elements_by_css_selector("td")
-        if(task_td[2].text == 'publishCRresult'):
+        if(task_td[2].text == self.result_task):
             task_tr.find_element_by_css_selector("a[data-title^='查看结果']").click()
             self.driver.find_element_by_css_selector("a[class^='toAddSearchHref'][data-title='查看学生结果']").click()
             task_student_ul = self.driver.find_element_by_css_selector("ul[class^='createNav setCollect chooseCreateMode js_nav']")
@@ -572,7 +576,7 @@ class TestPublish(ParametrizedTestCase):
                 close_list.click()
             # 新开的网页
             driver2.switch_to.frame("iframepage")
-            driver2.find_element_by_id("txtName").send_keys("publishCRresult")
+            driver2.find_element_by_id("txtName").send_keys(self.result_task)
             driver2.find_element_by_id("btnName").click()
             time.sleep(2)
             driver2.find_element_by_css_selector("a[class^='mcopen underline']").click()
@@ -580,7 +584,7 @@ class TestPublish(ParametrizedTestCase):
             time.sleep(3)
             for window_index in driver2.window_handles:
                 driver2.switch_to.window(window_index)
-                if (driver2.title == 'publishCRresult'):
+                if (driver2.title == self.result_task):
                     self.answer_question(driver2)
                     time.sleep(10)
                     break
@@ -612,7 +616,7 @@ class TestPublish(ParametrizedTestCase):
         task_tbody = self.driver.find_element_by_css_selector("tbody[class^='jqtransformdone']")
         task = task_tbody.find_elements_by_css_selector("tr td")
         task_name = task[2].text
-        if(task_name=='publishCRresult'):
+        if(task_name==self.result_task):
             task[0].find_element_by_css_selector("span a").click()
             self.driver.find_element_by_css_selector("a[class^='js_batchdelete']").click()
             self.driver.switch_to.default_content()
@@ -629,13 +633,13 @@ class TestPublish(ParametrizedTestCase):
                 task_name = task[2].text
                 self.driver.switch_to.default_content()
                 if(task_name!=''):
-                    self.assertNotEqual("publishCRresult",task_name)
+                    self.assertNotEqual(self.result_task,task_name)
                 else:
                     self.assertNotEqual('',task_name)
             else:
                 self.assertEqual('1','1')
         else:
-            self.assertNotEqual("publishCRresult",task_name)
+            self.assertNotEqual(self.result_task,task_name)
 
     #@unittest.skip("result")
     def test_cf_delete_template(self):
@@ -649,7 +653,7 @@ class TestPublish(ParametrizedTestCase):
         templeta_table = self.driver.find_element_by_css_selector("tbody[class='jqtransformdone']")
         first_template_td = templeta_table.find_elements_by_css_selector("tr td")
         task_name = first_template_td[1].text
-        if (task_name == 'TemplateCRresult'):
+        if (task_name == self.result_task):
             first_template_td[0].find_element_by_css_selector("span a").click()
             self.driver.find_element_by_css_selector("a[class^='js_batchd_delete']").click()
             self.driver.switch_to.default_content()
@@ -667,13 +671,13 @@ class TestPublish(ParametrizedTestCase):
                 task_name = task[1].text
                 self.driver.switch_to.default_content()
                 if (task_name != ''):
-                    self.assertNotEqual("TemplateCRresult", task_name)
+                    self.assertNotEqual(self.result_task, task_name)
                 else:
                     self.assertNotEqual('',task_name)
             else:
                 self.assertEqual('0', '0')
         else:
-            self.assertNotEqual("publishCRresult", task_name)
+            self.assertNotEqual(self.result_task, task_name)
 
     @classmethod
     def tearDownClass(cls):
